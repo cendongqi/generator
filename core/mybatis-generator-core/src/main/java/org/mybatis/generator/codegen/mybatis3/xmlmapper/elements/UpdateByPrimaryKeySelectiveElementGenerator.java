@@ -16,6 +16,7 @@
 package org.mybatis.generator.codegen.mybatis3.xmlmapper.elements;
 
 import org.mybatis.generator.api.IntrospectedColumn;
+import org.mybatis.generator.api.dom.java.FullyQualifiedJavaType;
 import org.mybatis.generator.api.dom.xml.Attribute;
 import org.mybatis.generator.api.dom.xml.TextElement;
 import org.mybatis.generator.api.dom.xml.XmlElement;
@@ -60,9 +61,13 @@ public class UpdateByPrimaryKeySelectiveElementGenerator extends AbstractXmlElem
                 ListUtilities.removeGeneratedAlwaysColumns(introspectedTable.getNonPrimaryKeyColumns())) {
             sb.setLength(0);
             sb.append(introspectedColumn.getJavaProperty());
-            sb.append(" != null and "); //$NON-NLS-1$
-            sb.append(introspectedColumn.getJavaProperty());
-            sb.append(" != ''");
+            sb.append(" != null"); //$NON-NLS-1$
+            if (!introspectedColumn.getFullyQualifiedJavaType().equals(FullyQualifiedJavaType.getDateInstance())
+                    && !"TIMESTAMP".equals(introspectedColumn.getJdbcTypeName())) {
+                sb.append(" and ");
+                sb.append(introspectedColumn.getJavaProperty());
+                sb.append(" != ''");
+            }
             XmlElement isNotNullElement = new XmlElement("if"); //$NON-NLS-1$
             isNotNullElement.addAttribute(new Attribute("test", sb.toString())); //$NON-NLS-1$
             dynamicElement.addElement(isNotNullElement);
